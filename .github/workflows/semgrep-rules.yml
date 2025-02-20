@@ -29,8 +29,18 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
+          cache: 'pip'
+
+      - name: Cache Semgrep rules
+        uses: actions/cache@v4
+        with:
+          path: frappe-semgrep-rules
+          key: semgrep-rules-${{ hashFiles('frappe-semgrep-rules/**') }}
+          restore-keys: |
+            semgrep-rules-
 
       - name: Download Semgrep rules
+        if: steps.cache-semgrep-rules.outputs.cache-hit != 'true'
         run: git clone --depth 1 https://github.com/frappe/semgrep-rules.git frappe-semgrep-rules
 
       - name: Download semgrep
