@@ -1,0 +1,26 @@
+name: Code quality and security check
+
+on:
+  workflow_call:
+    outputs:
+      checks-passed:
+        description: "Indicates if all checks passed"
+        value: ${{ jobs.check-status.outputs.success }}
+
+jobs:
+  codeql:
+    name: CodeQL
+    uses: ./.github/workflows/codeql.yml
+
+  semgrep:
+    name: Semgrep
+    uses: ./.github/workflows/semgrep-rules.yml
+
+  check-status:
+    needs: [codeql, semgrep]
+    runs-on: ubuntu-24.04
+    outputs:
+      success: ${{ steps.check.outputs.success }}
+    steps:
+      - id: check
+        run: echo "success=true" >> $GITHUB_OUTPUT

@@ -5,6 +5,7 @@
 name: Frappe Linter - Semgrep rules
 
 on:
+  workflow_call:
   push:
     paths-ignore:
       - '**/*.md'
