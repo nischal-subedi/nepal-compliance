@@ -7,6 +7,15 @@ on:
         description: "Indicates if all checks passed"
         value: ${{ jobs.check-status.outputs.success }}
 
+# permission in following order
+# read workflow files, read repo contents
+# write security event and read packages
+permissions:
+  actions: read
+  contents: read
+  security-events: write
+  packages: read
+
 jobs:
   codeql:
     name: CodeQL
