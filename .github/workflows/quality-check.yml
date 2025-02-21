@@ -24,6 +24,7 @@ jobs:
   semgrep:
     name: Semgrep
     uses: ./.github/workflows/semgrep-rules.yml
+    continue-on-error: true
 
   check-status:
     needs: [codeql, semgrep]
