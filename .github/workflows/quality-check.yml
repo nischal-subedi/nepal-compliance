@@ -24,7 +24,6 @@ jobs:
   semgrep:
     name: Semgrep
     uses: ./.github/workflows/semgrep-rules.yml
-    continue-on-error: true
 
   check-status:
     needs: [codeql, semgrep]
@@ -33,4 +32,10 @@ jobs:
       success: ${{ steps.check.outputs.success }}
     steps:
       - id: check
-        run: echo "success=true" >> $GITHUB_OUTPUT
+        # Modify this to return true even if semgrep fails
+        run: |
+          if [[ "${{ contains(needs.*.result, 'failure') && !contains(needs.semgrep.result, 'failure') }}" == "true" ]]; then
+            echo "success=false" >> $GITHUB_OUTPUT
+          else
+            echo "success=true" >> $GITHUB_OUTPUT
+          fi
