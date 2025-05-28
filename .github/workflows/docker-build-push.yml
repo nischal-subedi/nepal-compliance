@@ -54,7 +54,7 @@ jobs:
         with:
           context: ./frappe_docker
           platforms: linux/amd64,linux/arm64
-          file: images/custom/Containerfile
+          file: frappe_docker/images/custom/Containerfile
           push: true
           tags: docker.registry.yarsa.org/yarsalabs/nepal-compliance:latest
           # cache-from: type=registry,ref=docker.io/yarsalabs/nepal-compliance:latest
