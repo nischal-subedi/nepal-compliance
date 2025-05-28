@@ -55,7 +55,6 @@ jobs:
           push: true
           tags: | 
             docker.registry.yarsa.org/yarsalabs/nepal-compliance:latest
-            docker.registry.yarsa.org/yarsalabs/nepal-compliance:${commit-hash}
           cache-from: type=registry,ref=docker.registry.yarsa.org/nepal-compliance:latest
           cache-to: type=inline
           build-args: |
