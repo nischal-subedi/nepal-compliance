@@ -3,7 +3,8 @@ name: Build and Push amd64 Docker Image
 on:
   push:
     branches:
-      - master
+      # update this branch to main after testing
+      - multi-arch-support
     paths-ignore:
       - '**/*.md'
 
