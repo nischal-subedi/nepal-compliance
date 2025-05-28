@@ -45,6 +45,9 @@ jobs:
       - name: Clone frappe_docker
         run: git clone --depth=1 https://github.com/frappe/frappe_docker && cd frappe_docker
 
+      - name: list files
+        run: ls -la && echo "end" && ls -la ../
+
       - name: Build and push
         uses: docker/build-push-action@v6
         # env:
