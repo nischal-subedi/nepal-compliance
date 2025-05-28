@@ -43,7 +43,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Clone frappe_docker
-        run: git clone --depth=1 https://github.com/frappe/frappe_docker && cd frappe_docker
+        run: git clone --depth=1 https://github.com/frappe/frappe_docker && cd frappe_docker && ls -la frappe_docker
 
       - name: list files
         run: ls -la && echo "end" && ls -la ../
