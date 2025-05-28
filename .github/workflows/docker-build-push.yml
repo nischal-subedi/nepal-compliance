@@ -47,8 +47,8 @@ jobs:
 
       - name: Build and push
         uses: docker/build-push-action@v6
-        env:
-          SOURCE_DATE_EPOCH: 0
+        # env:
+        #   SOURCE_DATE_EPOCH: 0
         with:
           platforms: linux/amd64,linux/arm64
           file: images/custom/Containerfile
