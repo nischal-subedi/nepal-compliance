@@ -55,7 +55,7 @@ jobs:
           push: true
           tags: | 
             docker.registry.yarsa.org/yarsalabs/nepal-compliance:latest
-          cache-from: type=registry,ref=docker.registry.yarsa.org/nepal-compliance:latest
+          cache-from: type=registry,ref=docker.io/yarsalabs/nepal-compliance:latest
           cache-to: type=inline
           build-args: |
             FRAPPE_PATH=https://github.com/frappe/frappe
