@@ -1,5 +1,4 @@
-name: Build and Push Multi-Arch Docker Image
-
+name: Build and Push Multi-Architecture Docker Image (Native)
 on:
   push:
     branches:
@@ -10,13 +9,15 @@ on:
 env:
   TZ: /usr/share/zoneinfo/Asia/Kathmandu
   SEGMENT_DOWNLOAD_TIMEOUT_MINS: 1
+  REGISTRY: docker.io
+  IMAGE_NAME: dockmyapp0/nepal-compliance
 
 permissions:
   contents: read
   packages: write
 
 jobs:
-  generate-artifact:
+  build:
     strategy:
       matrix:
         include:
@@ -27,7 +28,10 @@ jobs:
             os: ubuntu-24.04-arm
             platform: linux/arm64
     runs-on: ${{ matrix.os }}
-
+    outputs:
+      image: ${{ steps.image.outputs.image }}
+      digest: ${{ steps.build.outputs.digest }}
+      metadata: ${{ steps.meta.outputs.json }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -37,17 +41,26 @@ jobs:
       - name: Login to Docker Registry
         uses: docker/login-action@v3
         with:
-          registry: docker.io
+          registry: ${{ env.REGISTRY }}
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest
+
       - name: Clone frappe_docker
         run: git clone --depth=1 https://github.com/frappe/frappe_docker
 
-      - name: Build and push image
+      - name: Build and push by digest
+        id: build
         uses: docker/build-push-action@v6
         env:
           SOURCE_DATE_EPOCH: 0
@@ -55,34 +68,66 @@ jobs:
           context: ./frappe_docker
           platforms: ${{ matrix.platform }}
           file: frappe_docker/images/custom/Containerfile
-          push: true
-          tags: docker.io/dockmyapp0/nepal-compliance:latest-${{ matrix.name }}
+          labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=image,name=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
           build-args: |
             FRAPPE_PATH=https://github.com/frappe/frappe
             FRAPPE_BRANCH=version-15
             PYTHON_VERSION=3.11.9
             NODE_VERSION=18.20.2
 
-  create-manifest:
-    name: Create and Push Multi-Arch Manifest
-    needs: generate-artifact
-    runs-on: ubuntu-latest
+      - name: Export digest
+        id: digest
+        run: |
+          mkdir -p /tmp/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"
+          echo "digest=${digest}" >> $GITHUB_OUTPUT
 
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ matrix.name }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  merge:
+    runs-on: ubuntu-24.04
+    needs: build
     steps:
-      - name: Login to DockerHub
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp/digests
+          pattern: digests-*
+          merge-multiple: true
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Registry
         uses: docker/login-action@v3
         with:
+          registry: ${{ env.REGISTRY }}
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Create and Push Manifest
-        run: |
-          docker manifest create docker.io/dockmyapp0/nepal-compliance:latest \
-            docker.io/dockmyapp0/nepal-compliance:latest-amd64 \
-            docker.io/dockmyapp0/nepal-compliance:latest-arm64
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest
 
-          docker manifest push docker.io/dockmyapp0/nepal-compliance:latest
-
-      - name: (Optional) Inspect Final Manifest
+      - name: Create manifest list and push
+        working-directory: /tmp/digests
         run: |
-          docker manifest inspect docker.io/dockmyapp0/nepal-compliance:latest
+          docker buildx imagetools create \
+            --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest \
+            $(printf '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@sha256:%s ' *)
+
+      - name: Inspect image
+        run: |
+          docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
