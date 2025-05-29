@@ -37,6 +37,11 @@ jobs:
       metadata: ${{ steps.meta.outputs.json }}
       tag: ${{ steps.tag.outputs.tag }}
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
       - name: Login to Docker Registry
         uses: docker/login-action@v3
         with:
@@ -89,18 +94,15 @@ jobs:
         run: |
           echo "APPS_JSON_BASE64=$(echo '${{ env.APPS_JSON_RAW }}' | base64 -w 0)" >> $GITHUB_ENV
 
-      - name: Clone frappe_docker
-        run: git clone --depth=1 https://github.com/frappe/frappe_docker
-
       - name: Build and push by digest
         id: build
         uses: docker/build-push-action@v6
         env:
           SOURCE_DATE_EPOCH: 0
         with:
-          context: ./frappe_docker
+          context: ./
           platforms: ${{ matrix.platform }}
-          file: frappe_docker/images/layered/Containerfile
+          file: Dockerfile
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,name=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
           build-args: |
