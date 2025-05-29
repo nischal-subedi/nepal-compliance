@@ -11,6 +11,7 @@ env:
   SEGMENT_DOWNLOAD_TIMEOUT_MINS: 1
   REGISTRY: docker.io
   IMAGE_NAME: dockmyapp0/nepal-compliance
+  APPS_JSON: ${{ vars.APPS_JSON }}
 
 permissions:
   contents: read
@@ -56,6 +57,10 @@ jobs:
           tags: |
             type=raw,value=latest
 
+      - name: Encode APPS_JSON to base64
+        run: |
+          echo "APPS_JSON_BASE64=$(echo '${{ env.APPS_JSON }}' | base64 -w 0)" >> $GITHUB_ENV
+
       - name: Clone frappe_docker
         run: git clone --depth=1 https://github.com/frappe/frappe_docker
 
@@ -75,7 +80,7 @@ jobs:
             FRAPPE_BRANCH=version-15
             PYTHON_VERSION=3.11.9
             NODE_VERSION=18.20.2
-            APPS_JSON_BASE64=${{ secrets.APPS_JSON_BASE64 }}
+            APPS_JSON_BASE64=${{ env.APPS_JSON_BASE64 }}
 
       - name: Export digest
         id: digest
