@@ -61,15 +61,15 @@ jobs:
           file: frappe_docker/images/custom/Containerfile
           push: true
           tags: docker.io/dockmyapp0/nepal-compliance:latest
-          cache-from: type=registry,ref=docker.io/yarsalabs/nepal-compliance:latest
-          cache-to: type=inline
+          # cache-from: type=registry,ref=docker.io/yarsalabs/nepal-compliance:latest
+          # cache-to: type=inline
           build-args: |
             FRAPPE_PATH=https://github.com/frappe/frappe
             FRAPPE_BRANCH=version-15
             PYTHON_VERSION=3.11.9
             NODE_VERSION=18.20.2
           
-
+# ----
       
 
 
