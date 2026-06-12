@@ -88,6 +88,7 @@ These variables are defined in an `.env` file and used to inject configuration i
 | `UPSTREAM_REAL_IP_RECURSIVE`| `"off"`                   | Enables/disables recursive lookup for real IPs.            |
 
 # Next
+* Set up a [local development environment](/docs/development.md)
 * Learn how to [contribute to this project](/CONTRIBUTING.md)
 * [Manual Install - Nepal Compliance](/docs/manual-install.md)
 

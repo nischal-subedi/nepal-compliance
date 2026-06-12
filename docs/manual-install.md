@@ -81,6 +81,7 @@ bench --site your_site_name migrate
 
 ---
 # Next
+* Set up a [local development environment](/docs/development.md)
 * Learn how to [contribute to this project](/CONTRIBUTING.md)
 * [Docker Install - Nepal Compliance](/docs/docker-install.md)
 

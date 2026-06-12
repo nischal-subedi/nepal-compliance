@@ -9,7 +9,7 @@ This document is a guide to help you through the process of contributing to Nepa
 # Become a Contributor
 As an open source project, you can contribute to the Nepal Compliance in many ways. Here are few examples of contributions:
 
-* Contribute directly to the codebase. [Open a Pull Request](https://github.com/yarsa/nepal-compliance/pulls)
+* Contribute directly to the codebase. [Open a Pull Request](https://github.com/yarsa/nepal-compliance/pulls) — see the [local development setup guide](/docs/development.md) to get started
 
 * Report bugs and suggest enhancements. [Create an Issue](https://github.com/yarsa/nepal-compliance/issues)
 
