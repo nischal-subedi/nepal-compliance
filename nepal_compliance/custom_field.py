@@ -7,7 +7,8 @@ def create_custom_fields():
     custom_fields = {
         "Company": [
             {"fieldname": "logo_for_printing", "label": "Logo For Printing", "fieldtype": "Attach", "insert_after": "parent_company"},
-            {"fieldname": "company_vat_number", "label": "Vat/Pan Number", "fieldtype": "Data", "insert_after": "default_holiday_list", "allow_on_submit": 1}
+            {"fieldname": "company_vat_number", "label": "Vat/Pan Number", "fieldtype": "Data", "insert_after": "default_holiday_list", "allow_on_submit": 1},
+            {"fieldname": "type_of_company", "label": "Type of Company", "fieldtype": "Select", "options": "\nEPF\nSSF", "insert_after": "company_vat_number", "description": "Select EPF or SSF for payroll compliance"}
         ],
         "Item": [
             {"fieldname": "is_nontaxable_item", "label": "Is Non-Taxable Item", "fieldtype": "Check", "insert_after": "is_stock_item"},
