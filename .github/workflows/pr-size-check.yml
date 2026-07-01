@@ -24,7 +24,6 @@ jobs:
               pull_number: context.payload.pull_request.number,
               per_page: 100,
             });
-                        
             const totalChanges = files.reduce((sum, file) => {
               return sum + file.additions + file.deletions;
             }, 0);
